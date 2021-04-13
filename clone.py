@@ -122,3 +122,34 @@ def clone(fn, flags=0, stacksize=DEFAULT_STACK_SIZE):
 
     assert child_pid != 0, "clone() should not return in the child process"
     return child_pid
+
+
+def clone_call(fn, flags=0):
+    """
+    Call a function under a clone()d child "process"
+
+    Arguments:
+    fn: Function to all
+    flags: CLONE_* flags
+
+    Limitations:
+    Cannot get return value of fn()
+    """
+    pid = clone(fn, flags)
+
+    _, status = os.waitpid(pid, 0)
+
+    status = waitstatus_to_exitcode(status)
+    if status < 0:
+        raise OSError(f"Child process terminated by signal {-status}")
+    if status > 0:
+        raise OSError(f"Child process exited with code {status}")
+
+
+def waitstatus_to_exitcode(status):
+    # TODO: os.waitstatus_to_exitcode() added in Python 3.9
+    if os.WIFEXITED(status):
+        return os.WEXITSTATUS(status)
+    if os.WIFSIGNALLED(status):
+        return -os.WTERMSIG(status)
+    raise ValueError(f"Unexpected status {status}")
