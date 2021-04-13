@@ -92,8 +92,13 @@ def clone(fn, flags=0, stacksize=DEFAULT_STACK_SIZE):
     # TODO
     arg = ctypes.c_void_p(0)
 
+    def child_func_wrap():
+        rc = fn()
+        if rc is None:
+            return 0
+
     child_pid = libc.clone(
-            ctypes.CFUNCTYPE(ctypes.c_int)(fn),
+            ctypes.CFUNCTYPE(ctypes.c_int)(child_func_wrap),
             child_stack_top,
             flags,
             arg,
