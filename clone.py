@@ -1,6 +1,7 @@
 import ctypes
 import os
 import signal
+import sys
 
 libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
@@ -93,7 +94,18 @@ def clone(fn, flags=0, stacksize=DEFAULT_STACK_SIZE):
     arg = ctypes.c_void_p(0)
 
     def child_func_wrap():
-        rc = fn()
+        try:
+            rc = fn()
+        except:
+            # Try to show a traceback
+            # TODO: A more elaborate solution would marshal the exception
+            #       object back to the parent via pipe.
+            try:
+                import traceback
+                print("Child function raised exception:", file=sys.stderr)
+                traceback.print_exc()
+            finally:
+                return 255
         if rc is None:
             return 0
 
