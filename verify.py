@@ -9,6 +9,12 @@ import stat
 
 SYSCTL_PATH = Path('/proc/sys')
 
+g_verbose = False
+
+def vprint(*args, **kwargs):
+    if g_verbose:
+        return print(*args, **kwargs)
+
 def warn(s):
     print(s, file=sys.stderr)
 
@@ -128,12 +134,11 @@ def frob_int(path, val):
 
 
 def do_netns_play():
-
-    print("-"*80)
-    print("Frobbing net sysctls in child netns:")
+    vprint("-"*80)
+    vprint("Frobbing net sysctls in child netns:")
 
     for path, val in iterate_sysctl_values("net"):
-        print(f"{path}: {val}")
+        vprint(f"{path}: {val}")
 
         # If not readable, ignore
         if not (path.stat().st_mode & stat.S_IWUSR):
@@ -142,18 +147,30 @@ def do_netns_play():
         for frob in (frob_special, frob_int, frob_int_vec):
             new = frob(path, val)
             if new is not None:
-                print("  -> ", new)
+                vprint("  -> ", new)
                 path.write_text(new)
                 break
         else:
             raise Exception(f"No function to frob {path}!")
 
-    print("-"*80)
+    vprint("-"*80)
 
 
+def parse_args():
+    global g_verbose
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-v', '--verbose', action='store_true',
+            help="Verbose output")
+    args = ap.parse_args()
+
+    g_verbose = args.verbose
+    return args
 
 
 def main():
+    args = parse_args()
+
     s1 = snapshot()
 
     flags = clone.CLONE_NEWNET
