@@ -178,6 +178,8 @@ def parse_args():
     global g_verbose
     import argparse
     ap = argparse.ArgumentParser()
+    ap.add_argument('-U', '--user', action='store_true',
+            help="Create new user namespace")
     ap.add_argument('-v', '--verbose', action='store_true',
             help="Verbose output")
     args = ap.parse_args()
@@ -192,6 +194,9 @@ def main():
     s1 = snapshot()
 
     flags = clone.CLONE_NEWNET
+    if args.user:
+        flags |= clone.CLONE_NEWUSER
+
     clone.clone_call(do_netns_play, flags)
 
     s2 = snapshot()
