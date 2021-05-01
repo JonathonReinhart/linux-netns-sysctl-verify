@@ -49,6 +49,22 @@ Anything in the parent which changed as a result of manipulations in the child
 is considered a "leak".
 
 
+# Usage
+
+```
+usage: verify.py [-h] [-v]
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  Verbose output
+```
+
+Currently, this must be run as root, in order to use `CLONE_NEWNET`.
+
+```
+$ sudo ./verify.py -v
+```
+
 
 [sysctl]: https://man7.org/linux/man-pages/man8/sysctl.8.html
 [network_namespaces]: https://man7.org/linux/man-pages/man7/network_namespaces.7.html
