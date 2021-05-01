@@ -173,6 +173,22 @@ def do_netns_play():
 
     vprint("-"*80)
 
+def check_unpriv_userns():
+    if os.geteuid() == 0:
+        return
+
+    name = "kernel.unprivileged_userns_clone"
+    path = SYSCTL_PATH / name.replace(".", "/")
+    if not path.exists():
+        return
+
+    val = int(path.read_text())
+    if val == 0:
+        print(f"Sysctl {name} is disallowing unprivileged userns creation.", file=sys.stderr)
+        print(f"Either run this as root, or run:")
+        print(f"sudo sysctl -w {name}=1")
+        raise SystemExit(1)
+
 
 def parse_args():
     global g_verbose
@@ -195,6 +211,7 @@ def main():
 
     flags = clone.CLONE_NEWNET
     if args.user:
+        check_unpriv_userns()
         flags |= clone.CLONE_NEWUSER
 
     clone.clone_call(do_netns_play, flags)
