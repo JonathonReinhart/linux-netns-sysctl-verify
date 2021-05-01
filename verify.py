@@ -60,9 +60,22 @@ def dict_compare(d1, d2):
     same = set(o for o in shared_keys if d1[o] == d2[o])
     return added, removed, modified, same
 
+
+def get_avail_tcp_cong():
+    path = SYSCTL_PATH / "net/ipv4/tcp_available_congestion_control"
+    return set(path.read_text().strip().split())
+
+
+def frob_tcp_cong(path, val):
+    avail = get_avail_tcp_cong()
+    avail.remove(val)
+    res = avail.pop()   # arbitrary
+    return res
+
+
 special_sysctls = {
     '/proc/sys/net/ipv4/ip_local_reserved_ports':   ("", "69-6969"),
-    '/proc/sys/net/ipv4/tcp_congestion_control':    ("cubic", "reno"),
+    '/proc/sys/net/ipv4/tcp_congestion_control':    frob_tcp_cong,
     '/proc/sys/net/ipv4/tcp_allowed_congestion_control': ("reno bbr cubic", "reno cubic"),
     '/proc/sys/net/ipv4/tcp_fastopen_key': ("00000000-00000000-00000000-00000000", "11111111-22222222-33333333-44444444"),
     '/proc/sys/net/ipv6/icmp/ratemask':                 ("0-1,3-127", "0-1,6-69"),
