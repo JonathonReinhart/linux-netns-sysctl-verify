@@ -36,6 +36,19 @@ of bugs from going unnoticed:
   `net: Ensure net namespace isolation of sysctls`
 
 
+# Theory of Operation
+The premise behind this tool is simple:
+- Take a snapshot of all values in `/proc/sys/net`.
+- Create a child process with a new netns (using `CLONE_NEWNET`).
+- In the child netns, modify every writable value in `/proc/sys/net`.
+- Exit the child netns.
+- Take a second snapshot of `/proc/sys/net`.
+- Compare the snapshots and report any differences.
+
+Anything in the parent which changed as a result of manipulations in the child
+is considered a "leak".
+
+
 
 [sysctl]: https://man7.org/linux/man-pages/man8/sysctl.8.html
 [network_namespaces]: https://man7.org/linux/man-pages/man7/network_namespaces.7.html
