@@ -72,11 +72,16 @@ def frob_tcp_cong(path, val):
     res = avail.pop()   # arbitrary
     return res
 
+def frob_tcp_allowed_cong(path, val):
+    cur = set(val.split())
+    cur.pop()   # arbitrary
+    return " ".join(cur)
+
 
 special_sysctls = {
     '/proc/sys/net/ipv4/ip_local_reserved_ports':   ("", "69-6969"),
     '/proc/sys/net/ipv4/tcp_congestion_control':    frob_tcp_cong,
-    '/proc/sys/net/ipv4/tcp_allowed_congestion_control': ("reno bbr cubic", "reno cubic"),
+    '/proc/sys/net/ipv4/tcp_allowed_congestion_control': frob_tcp_allowed_cong,
     '/proc/sys/net/ipv4/tcp_fastopen_key': ("00000000-00000000-00000000-00000000", "11111111-22222222-33333333-44444444"),
     '/proc/sys/net/ipv6/icmp/ratemask':                 ("0-1,3-127", "0-1,6-69"),
     '/proc/sys/net/ipv6/route/skip_notify_on_dev_down': ('256', '0'),
