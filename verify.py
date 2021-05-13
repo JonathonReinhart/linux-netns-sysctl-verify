@@ -62,8 +62,7 @@ def dict_compare(d1, d2):
 
 
 def get_avail_tcp_cong():
-    path = SYSCTL_PATH / "net/ipv4/tcp_available_congestion_control"
-    return set(path.read_text().strip().split())
+    return set(g_avail_tcp_cong)    # copy
 
 
 def frob_tcp_cong(path, val):
@@ -174,6 +173,13 @@ def do_netns_play():
     vprint("-"*80)
 
 
+def preload_globals():
+    global g_avail_tcp_cong
+
+    path = SYSCTL_PATH / "net/ipv4/tcp_available_congestion_control"
+    g_avail_tcp_cong = set(path.read_text().strip().split())
+
+
 def parse_args():
     global g_verbose
     import argparse
@@ -188,6 +194,8 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    preload_globals()
 
     s1 = snapshot()
 
