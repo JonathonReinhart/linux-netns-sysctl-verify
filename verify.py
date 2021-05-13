@@ -222,7 +222,8 @@ def preload_globals():
     if allow_tcp_cong == g_avail_tcp_cong:
         warn("All available TCP congestion control algorithms are allowed.\n"
              "    Consider reducing net/ipv4/tcp_allowed_congestion_control\n"
-             "    for a better test.")
+             "    for a better test. E.g.:\n"
+             "    sudo sysctl net.ipv4.tcp_allowed_congestion_control=cubic")
 
 
 def parse_args():
