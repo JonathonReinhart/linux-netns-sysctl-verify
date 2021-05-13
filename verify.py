@@ -240,7 +240,7 @@ def main():
     added, removed, modified, _ = dict_compare(s1, s2)
  
     if added or removed or modified:
-        print("\nParent net namespace modified!\n")
+        print(red("\nParent net namespace modified!"))
         for a in added:
             print(f"+ {a}")
         for r in removed:
@@ -248,7 +248,7 @@ def main():
         for k, (old, new) in modified.items():
             print(f"~ {k}: {old} -> {new}")
         raise SystemExit(1)
-    print("No changes detected")
+    print(green("No changes detected"))
 
 if __name__ == '__main__':
     main()
