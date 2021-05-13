@@ -28,12 +28,20 @@ of several sysctls, which have been subsequently fixed by this tool's author.
 Additionally, a safety check was added to the kernel to prevent certain classes
 of bugs from going unnoticed:
 
-- [`2671fa4dc010`](https://github.com/torvalds/linux/commit/2671fa4dc010):
-  `netfilter: conntrack: Make global sysctls readonly in non-init netns`
-- [`97684f0970f6`](https://github.com/torvalds/linux/commit/97684f0970f6):
-  `net: Make tcp_allowed_congestion_control readonly in non-init netns`
 - [`31c4d2f160eb`](https://github.com/torvalds/linux/commit/31c4d2f160eb):
   `net: Ensure net namespace isolation of sysctls`
+- [`2671fa4dc010`](https://github.com/torvalds/linux/commit/2671fa4dc010):
+  `netfilter: conntrack: Make global sysctls readonly in non-init netns`
+  - `net.nf_conntrack_max`
+  - `net.netfilter.nf_conntrack_max`
+  - `net.netfilter.nf_conntrack_expect_max`
+- [`97684f0970f6`](https://github.com/torvalds/linux/commit/97684f0970f6):
+  `net: Make tcp_allowed_congestion_control readonly in non-init netns`
+  - `net.ipv4.tcp_allowed_congestion_control`
+- [`8d432592f30f`](https://github.com/torvalds/linux/commit/8d432592f30f):
+  `net: Only allow init netns to set default tcp cong to a restricted algo`
+  - `net.ipv4.tcp_congestion_control` (affects)
+  - `net.ipv4.tcp_allowed_congestion_control` (affected)
 
 
 # Theory of Operation
