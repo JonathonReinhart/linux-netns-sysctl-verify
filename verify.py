@@ -50,6 +50,9 @@ def iterate_sysctl_values(path=""):
             if e.errno == errno.EIO:
                 if path.name == "stable_secret":
                     continue
+            if e.errno == errno.EINVAL:
+                if path.name == "forwarding" and path.parent.parent.parent.name == "decnet":
+                    continue
             warn(f"Error reading {path}: {e}")
             continue
 
