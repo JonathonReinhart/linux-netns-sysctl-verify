@@ -2,6 +2,37 @@ linux-netns-sysctl-verify
 =========================
 Linux network namespace sysctl safety verifier.
 
+Ensure that `net` sysctls are network-namespace-safe.
+
+# Usage
+
+```
+usage: verify.py [-h] [-v]
+
+optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  Verbose output
+```
+
+Currently, this must be run as root, in order to use `CLONE_NEWNET`.
+
+```
+$ sudo ./verify.py -v
+```
+
+# Theory of Operation
+The premise behind this tool is simple:
+- Take a snapshot of all values in `/proc/sys/net`.
+- Create a child process with a new netns (using `CLONE_NEWNET`).
+- In the child netns, modify every writable value in `/proc/sys/net`.
+- Exit the child netns.
+- Take a second snapshot of `/proc/sys/net`.
+- Compare the snapshots and report any differences.
+
+Anything in the parent which changed as a result of manipulations in the child
+is considered a "leak".
+
+
 # Background
 The Linux kernel provides runtime-configurable kernel parameters known as
 ["sysctls"][sysctl], which are accessed via `/proc/sys/`.
@@ -22,14 +53,13 @@ the latest version of Docker (20.10.6 as of this writing) mounts all of
 out of the container. This protection mechanism makes it more difficult (and
 less secure) to run a [libvirt] QEMU VM inside of a Docker container.
 
-This tool was inspired by conversation on [this runc issue][runc_2826].  Use of
-this tool helped to uncover several bugs in the Linux kernel's implementation
-of several sysctls, which have been subsequently fixed by this tool's author.
-Additionally, a safety check was added to the kernel to prevent certain classes
-of bugs from going unnoticed:
+This tool was inspired by conversation on [this runc issue][runc_2826].
 
-- [`31c4d2f160eb`](https://github.com/torvalds/linux/commit/31c4d2f160eb):
-  `net: Ensure net namespace isolation of sysctls`
+# Results
+Use of this tool helped to uncover several bugs in the Linux kernel's
+implementation of several sysctls, which have been subsequently fixed by this
+tool's author:
+
 - [`2671fa4dc010`](https://github.com/torvalds/linux/commit/2671fa4dc010):
   `netfilter: conntrack: Make global sysctls readonly in non-init netns`
   - `net.nf_conntrack_max`
@@ -44,34 +74,11 @@ of bugs from going unnoticed:
   - `net.ipv4.tcp_allowed_congestion_control` (affected)
 
 
-# Theory of Operation
-The premise behind this tool is simple:
-- Take a snapshot of all values in `/proc/sys/net`.
-- Create a child process with a new netns (using `CLONE_NEWNET`).
-- In the child netns, modify every writable value in `/proc/sys/net`.
-- Exit the child netns.
-- Take a second snapshot of `/proc/sys/net`.
-- Compare the snapshots and report any differences.
+Additionally, a safety check was added to the kernel to prevent
+certain classes of bugs from going unnoticed:
 
-Anything in the parent which changed as a result of manipulations in the child
-is considered a "leak".
-
-
-# Usage
-
-```
-usage: verify.py [-h] [-v]
-
-optional arguments:
-  -h, --help     show this help message and exit
-  -v, --verbose  Verbose output
-```
-
-Currently, this must be run as root, in order to use `CLONE_NEWNET`.
-
-```
-$ sudo ./verify.py -v
-```
+- [`31c4d2f160eb`](https://github.com/torvalds/linux/commit/31c4d2f160eb):
+  `net: Ensure net namespace isolation of sysctls`
 
 
 [sysctl]: https://man7.org/linux/man-pages/man8/sysctl.8.html
