@@ -113,7 +113,7 @@ def frob_special(path, val):
         if val != exp:
             # TODO: Ideally we wouldn't have any fixed expected values,
             #       and we could always frob to something different...
-            raise FrobError(f"Expected current value to be {exp}, but found {val}")
+            raise AssertionError(f"Expected current value to be {exp}, but found {val}")
         return new
     if f:
         return f(path, val)
