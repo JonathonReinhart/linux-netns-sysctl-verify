@@ -15,8 +15,21 @@ def vprint(*args, **kwargs):
     if g_verbose:
         return print(*args, **kwargs)
 
+
 def warn(s):
-    print(s, file=sys.stderr)
+    print(yellow(str(s)), file=sys.stderr)
+
+def color(s, c):
+    return f'\033[{c}m' + s + '\033[0m'
+
+def red(s):
+    return color(s, 31)
+
+def green(s):
+    return color(s, 32)
+
+def yellow(s):
+    return color(s, 33)
 
 
 def iterate_sysctl(path=""):
