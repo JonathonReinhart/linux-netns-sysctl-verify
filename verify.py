@@ -43,12 +43,11 @@ def iterate_sysctl_values(path=""):
     for path in iterate_sysctl(path):
         try:
             value = path.read_text().strip()
-        except PermissionError as e:
-            #warn(str(e))
-            continue
         except OSError as e:
-            if not e.errno in (errno.EIO, errno.EINVAL):
-                raise Exception(f"Error reading {path}") from e
+            if isinstance(e, PermissionError) and not os.access(path, os.R_OK):
+                # If it's not readable, just ignore it
+                continue
+            warn(f"Error reading {path}: {e}")
             continue
 
         yield path, value
