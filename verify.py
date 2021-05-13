@@ -165,9 +165,31 @@ def frob_int(path, val):
     return str(ival)
 
 
+class FrobError(Exception):
+    pass
+
+def frob_sysctl(path, val):
+    for frob in (frob_special, frob_int, frob_int_vec):
+        try:
+            new = frob(path, val)
+        except AssertionError as e:
+            raise FrobError(f"Error frobbing {path}: {e}")
+
+        if new is not None:
+            break
+    else:
+        raise NotImplementedError(f"Don't know how to frob")
+
+    vprint("  -> ", new)
+    try:
+        path.write_text(new)
+    except OSError as e:
+        raise FrobError(f"Error writing {new!r} > {path}: {e}") from e
+
+
 def do_netns_play():
     vprint("-"*80)
-    vprint("Frobbing net sysctls in child netns:")
+    print("Frobbing net sysctls in child netns")
 
     for path, val in iterate_sysctl_values("net"):
         vprint(f"{path}: {val}")
@@ -176,14 +198,10 @@ def do_netns_play():
         if not (path.stat().st_mode & stat.S_IWUSR):
             continue
         
-        for frob in (frob_special, frob_int, frob_int_vec):
-            new = frob(path, val)
-            if new is not None:
-                vprint("  -> ", new)
-                path.write_text(new)
-                break
-        else:
-            raise Exception(f"No function to frob {path}!")
+        try:
+            frob_sysctl(path, val)
+        except (FrobError, NotImplementedError) as e:
+            warn(e)
 
     vprint("-"*80)
 
