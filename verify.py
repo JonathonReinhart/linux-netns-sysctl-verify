@@ -212,8 +212,17 @@ def do_netns_play():
 def preload_globals():
     global g_avail_tcp_cong
 
-    path = SYSCTL_PATH / "net/ipv4/tcp_available_congestion_control"
-    g_avail_tcp_cong = set(path.read_text().strip().split())
+    def get_cong(path):
+        path = SYSCTL_PATH / path
+        return set(path.read_text().strip().split())
+
+    g_avail_tcp_cong = get_cong("net/ipv4/tcp_available_congestion_control")
+
+    allow_tcp_cong = get_cong("net/ipv4/tcp_allowed_congestion_control")
+    if allow_tcp_cong == g_avail_tcp_cong:
+        warn("All available TCP congestion control algorithms are allowed.\n"
+             "    Consider reducing net/ipv4/tcp_allowed_congestion_control\n"
+             "    for a better test.")
 
 
 def parse_args():
