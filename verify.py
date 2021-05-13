@@ -157,7 +157,7 @@ def do_netns_play():
     for path, val in iterate_sysctl_values("net"):
         vprint(f"{path}: {val}")
 
-        # If not readable, ignore
+        # If not writable, ignore
         if not (path.stat().st_mode & stat.S_IWUSR):
             continue
         
