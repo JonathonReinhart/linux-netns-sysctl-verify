@@ -148,6 +148,21 @@ U16_MAX = 0xFFFF
 I32_MAX = 0x7FFFFFFF
 U32_MAX = 0xFFFFFFFF
 
+# Ranges/sequences of values for which integer values should be decremented.
+# Use a sequence of ranges/sequences (unflattened) for fast `if ... in`.
+intval_decrement = (
+    range(1, 20),
+    range(1300, 1500), # mtu
+    (
+        U8_MAX, U8_MAX+1,
+        U16_MAX, U16_MAX+1,
+        U32_MAX,
+        I32_MAX,
+        0x40000,
+        0x400000,
+    ),
+)
+
 def frob_int(path, val):
     # Does it look like an integer?
     try:
@@ -156,12 +171,10 @@ def frob_int(path, val):
         return
 
     # Try to adjust it in a way that will work without trying too hard here.
-    if ival in range(1, 20):
-        ival -= 1
-    elif ival in range(1300, 1500): # mtu
-        ival -= 1
-    elif ival in (U8_MAX, U8_MAX+1, U16_MAX, U16_MAX+1, U32_MAX, I32_MAX, 0x40000, 0x400000):
-        ival -= 1
+    for r in intval_decrement:
+        if ival in r:
+            ival -= 1
+            break
     else:
         ival += 1
 
