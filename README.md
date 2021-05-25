@@ -65,6 +65,7 @@ tool's author:
   - `net.nf_conntrack_max`
   - `net.netfilter.nf_conntrack_max`
   - `net.netfilter.nf_conntrack_expect_max`
+- First broken: (long ago; since introduction of net namespaces)
 - Fix: `netfilter: conntrack: Make global sysctls readonly in non-init netns`
 - Fixed in Kernels:
   - 5.13+: `v5.13-rc1` ([`2671fa4dc010`](https://github.com/gregkh/linux/commit/2671fa4dc010))
@@ -79,6 +80,7 @@ tool's author:
 **Bug 2**: `tcp_allowed_congestion_control` is global and writable by any netns
 - Affected sysctls:
   - `net.ipv4.tcp_allowed_congestion_control`
+- First broken: v5.7
 - Fix: `net: Make tcp_allowed_congestion_control readonly in non-init netns`
 - Fixed in Kernels:
   - 5.12+: `v5.12-rc8` ([`97684f0970f6`](https://github.com/gregkh/linux/commit/97684f0970f6))
@@ -93,6 +95,7 @@ tool's author:
 - Related sysctls:
   - `net.ipv4.tcp_congestion_control` (affects)
   - `net.ipv4.tcp_allowed_congestion_control` (affected)
+- First broken: v4.15
 - Fix: `net: Only allow init netns to set default tcp cong to a restricted algo`
 - Fixed in Kernels:
   - 5.13+: `v5.13-rc1` ([`8d432592f30f`](https://github.com/gregkh/linux/commit/8d432592f30f))
