@@ -160,7 +160,7 @@ def frob_int(path, val):
         ival -= 1
     elif ival in range(1300, 1500): # mtu
         ival -= 1
-    elif ival in (U8_MAX, U8_MAX+1, U16_MAX, U16_MAX+1, U32_MAX, I32_MAX, 0x400000):
+    elif ival in (U8_MAX, U8_MAX+1, U16_MAX, U16_MAX+1, U32_MAX, I32_MAX, 0x40000, 0x400000):
         ival -= 1
     else:
         ival += 1
