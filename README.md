@@ -60,24 +60,52 @@ Use of this tool helped to uncover several bugs in the Linux kernel's
 implementation of several sysctls, which have been subsequently fixed by this
 tool's author:
 
-- [`2671fa4dc010`](https://github.com/torvalds/linux/commit/2671fa4dc010):
-  `netfilter: conntrack: Make global sysctls readonly in non-init netns`
-  - `net.nf_conntrack_max`
-  - `net.netfilter.nf_conntrack_max`
-  - `net.netfilter.nf_conntrack_expect_max`
-- [`97684f0970f6`](https://github.com/torvalds/linux/commit/97684f0970f6):
-  `net: Make tcp_allowed_congestion_control readonly in non-init netns`
-  - `net.ipv4.tcp_allowed_congestion_control`
-- [`8d432592f30f`](https://github.com/torvalds/linux/commit/8d432592f30f):
-  `net: Only allow init netns to set default tcp cong to a restricted algo`
-  - `net.ipv4.tcp_congestion_control` (affects)
-  - `net.ipv4.tcp_allowed_congestion_control` (affected)
+- `netfilter: conntrack: Make global sysctls readonly in non-init netns`
+  - Affected sysctls:
+    - `net.nf_conntrack_max`
+    - `net.netfilter.nf_conntrack_max`
+    - `net.netfilter.nf_conntrack_expect_max`
+  - Fixed in Kernels:
+    - 5.13+: `v5.13-rc1` ([`2671fa4dc010`](https://github.com/gregkh/linux/commit/2671fa4dc010))
+    - 5.12: `v5.12.2` ([`671c54ea8c7f`](https://github.com/gregkh/linux/commit/671c54ea8c7f))
+    - 5.11: `v5.11.19` ([`fbf85a34ce17`](https://github.com/gregkh/linux/commit/fbf85a34ce17))
+    - 5.10: `v5.10.35` ([`d3598eb3915c`](https://github.com/gregkh/linux/commit/d3598eb3915c))
+    - 5.4: `v5.4.120` ([`baea536cf51f`](https://github.com/gregkh/linux/commit/baea536cf51f))
+    - 4.19: `v4.19.191` ([`9b288479f7a9`](https://github.com/gregkh/linux/commit/9b288479f7a9))
+    - 4.14: `v4.14.233` ([`68122479c128`](https://github.com/gregkh/linux/commit/68122479c128))
+    - 4.9: `v4.9.269` ([`da50f56e826e`](https://github.com/gregkh/linux/commit/da50f56e826e))
+
+- `net: Make tcp_allowed_congestion_control readonly in non-init netns`
+  - Affected sysctls:
+    - `net.ipv4.tcp_allowed_congestion_control`
+  - Fixed in Kernels:
+    - 5.12+: `v5.12-rc8` ([`97684f0970f6`](https://github.com/gregkh/linux/commit/97684f0970f6))
+    - 5.11: `v5.11.16` ([`1ccdf1bed140`](https://github.com/gregkh/linux/commit/1ccdf1bed140))
+    - 5.10: `v5.10.32` ([`35d7491e2f77`](https://github.com/gregkh/linux/commit/35d7491e2f77))
+    - 5.4: (n/a)
+    - 4.19: (n/a)
+    - 4.14: (n/a)
+    - 4.4: (n/a)
+
+- `net: Only allow init netns to set default tcp cong to a restricted algo`
+  - Related sysctls:
+    - `net.ipv4.tcp_congestion_control` (affects)
+    - `net.ipv4.tcp_allowed_congestion_control` (affected)
+  - Fixed in Kernels:
+    - 5.13+: `v5.13-rc1` ([`8d432592f30f`](https://github.com/gregkh/linux/commit/8d432592f30f))
+    - 5.12: `v5.12.4` ([`e7d7bedd507b`](https://github.com/gregkh/linux/commit/e7d7bedd507b))
+    - 5.11: `v5.11.21` ([`efe1532a6e1a`](https://github.com/gregkh/linux/commit/efe1532a6e1a))
+    - 5.10: `v5.10.37` ([`6c1ea8bee75d`](https://github.com/gregkh/linux/commit/6c1ea8bee75d))
+    - 5.4: `v5.4.119` ([`9884f745108f`](https://github.com/gregkh/linux/commit/9884f745108f))
+    - 4.19: `v4.19.191` ([`992de06308d9`](https://github.com/gregkh/linux/commit/992de06308d9))
+    - 4.14: (n/a)
+    - 4.9: (n/a)
 
 
 Additionally, a safety check was added to the kernel to prevent
 certain classes of bugs from going unnoticed:
 
-- [`31c4d2f160eb`](https://github.com/torvalds/linux/commit/31c4d2f160eb):
+- [`31c4d2f160eb`](https://github.com/gregkh/linux/commit/31c4d2f160eb):
   `net: Ensure net namespace isolation of sysctls`
 
 
