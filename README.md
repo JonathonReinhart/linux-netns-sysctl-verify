@@ -60,11 +60,12 @@ Use of this tool helped to uncover several bugs in the Linux kernel's
 implementation of several sysctls, which have been subsequently fixed by this
 tool's author:
 
-- `netfilter: conntrack: Make global sysctls readonly in non-init netns`
+- **Bug 1**: Several `nf_conntrack` sysctls are global and writable by any netns
   - Affected sysctls:
     - `net.nf_conntrack_max`
     - `net.netfilter.nf_conntrack_max`
     - `net.netfilter.nf_conntrack_expect_max`
+  - Fix: `netfilter: conntrack: Make global sysctls readonly in non-init netns`
   - Fixed in Kernels:
     - 5.13+: `v5.13-rc1` ([`2671fa4dc010`](https://github.com/gregkh/linux/commit/2671fa4dc010))
     - 5.12: `v5.12.2` ([`671c54ea8c7f`](https://github.com/gregkh/linux/commit/671c54ea8c7f))
@@ -75,9 +76,10 @@ tool's author:
     - 4.14: `v4.14.233` ([`68122479c128`](https://github.com/gregkh/linux/commit/68122479c128))
     - 4.9: `v4.9.269` ([`da50f56e826e`](https://github.com/gregkh/linux/commit/da50f56e826e))
 
-- `net: Make tcp_allowed_congestion_control readonly in non-init netns`
+- **Bug 2**: `tcp_allowed_congestion_control` is global and writable by any netns
   - Affected sysctls:
     - `net.ipv4.tcp_allowed_congestion_control`
+  - Fix: `net: Make tcp_allowed_congestion_control readonly in non-init netns`
   - Fixed in Kernels:
     - 5.12+: `v5.12-rc8` ([`97684f0970f6`](https://github.com/gregkh/linux/commit/97684f0970f6))
     - 5.11: `v5.11.16` ([`1ccdf1bed140`](https://github.com/gregkh/linux/commit/1ccdf1bed140))
@@ -87,10 +89,11 @@ tool's author:
     - 4.14: (n/a)
     - 4.4: (n/a)
 
-- `net: Only allow init netns to set default tcp cong to a restricted algo`
+- **Bug 3**: Setting `tcp_congestion_control` can globally affect `tcp_allowed_congestion_control`
   - Related sysctls:
     - `net.ipv4.tcp_congestion_control` (affects)
     - `net.ipv4.tcp_allowed_congestion_control` (affected)
+  - Fix: `net: Only allow init netns to set default tcp cong to a restricted algo`
   - Fixed in Kernels:
     - 5.13+: `v5.13-rc1` ([`8d432592f30f`](https://github.com/gregkh/linux/commit/8d432592f30f))
     - 5.12: `v5.12.4` ([`e7d7bedd507b`](https://github.com/gregkh/linux/commit/e7d7bedd507b))
