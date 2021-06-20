@@ -11,8 +11,13 @@ SYSCTL_PATH = Path('/proc/sys')
 
 # Modifications to these sysctls should be ignored
 MODIFICATION_IGNORE = {
-    # This can change at any time, regardless of sysctl changes
+    # This can change at any time, regardless of sysctl changes (see issue #6)
     'net/netfilter/nf_conntrack_count',
+}
+
+IGNORE_WRITE_ERRORS = {
+    # EPREM is is expected for restricted algos (see issue #2)
+    'net/ipv4/tcp_congestion_control': errno.EPERM,
 }
 
 g_verbose = False
@@ -214,7 +219,14 @@ def frob_sysctl(path, val):
     try:
         path.write_text(new)
     except OSError as e:
-        raise FrobError(f"Error writing {new!r} > {path}: {e}") from e
+        if not ignore_write_error(path, e):
+            raise FrobError(f"Error writing {new!r} > {path}: {e}") from e
+
+def ignore_write_error(path, e):
+    try:
+        return e.errno == IGNORE_WRITE_ERRORS[path_to_name(path)]
+    except KeyError:
+        return False
 
 
 def do_netns_play():
