@@ -64,11 +64,13 @@ def iterate_sysctl_values(path=""):
 
         yield path, value
 
+def path_to_name(path):
+    return str(path.relative_to(SYSCTL_PATH))
 
 def snapshot():
     result = dict()
     for path, val in iterate_sysctl_values("net"):
-        k = str(path.relative_to(SYSCTL_PATH))
+        k = path_to_name(path)
         result[k] = val
 
     return result
