@@ -9,6 +9,12 @@ import stat
 
 SYSCTL_PATH = Path('/proc/sys')
 
+# Modifications to these sysctls should be ignored
+MODIFICATION_IGNORE = {
+    # This can change at any time, regardless of sysctl changes
+    'net/netfilter/nf_conntrack_count',
+}
+
 g_verbose = False
 
 def vprint(*args, **kwargs):
@@ -78,6 +84,12 @@ def dict_compare(d1, d2):
     same = set(o for o in shared_keys if d1[o] == d2[o])
     return added, removed, modified, same
 
+def dict_remove(d, keys):
+    for k in keys:
+        try:
+            d.pop(k)
+        except KeyError:
+            pass
 
 def get_avail_tcp_cong():
     return set(g_avail_tcp_cong)    # copy
@@ -264,6 +276,8 @@ def main():
     s2 = snapshot()
 
     added, removed, modified, _ = dict_compare(s1, s2)
+
+    dict_remove(modified, MODIFICATION_IGNORE)
  
     if added or removed or modified:
         print(red("\nParent net namespace modified!"))
