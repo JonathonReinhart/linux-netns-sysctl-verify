@@ -247,6 +247,22 @@ def do_netns_play():
 
     vprint("-"*80)
 
+def check_unpriv_userns():
+    if os.geteuid() == 0:
+        return
+
+    name = "kernel.unprivileged_userns_clone"
+    path = SYSCTL_PATH / name.replace(".", "/")
+    if not path.exists():
+        return
+
+    val = int(path.read_text())
+    if val == 0:
+        print(f"Sysctl {name} is disallowing unprivileged userns creation.", file=sys.stderr)
+        print(f"Either run this as root, or run:")
+        print(f"sudo sysctl -w {name}=1")
+        raise SystemExit(1)
+
 
 def preload_globals():
     global g_avail_tcp_cong
@@ -269,6 +285,8 @@ def parse_args():
     global g_verbose
     import argparse
     ap = argparse.ArgumentParser()
+    ap.add_argument('-U', '--user', action='store_true',
+            help="Create new user namespace")
     ap.add_argument('-v', '--verbose', action='store_true',
             help="Verbose output")
     args = ap.parse_args()
@@ -285,6 +303,10 @@ def main():
     s1 = snapshot()
 
     flags = clone.CLONE_NEWNET
+    if args.user:
+        check_unpriv_userns()
+        flags |= clone.CLONE_NEWUSER
+
     clone.clone_call(do_netns_play, flags)
 
     s2 = snapshot()
